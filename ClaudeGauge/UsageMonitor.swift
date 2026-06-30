@@ -6,12 +6,18 @@
 import Foundation
 import Combine
 import WidgetKit
+import AppKit
 
 @MainActor
 final class UsageMonitor: ObservableObject {
 
     @Published private(set) var snapshot: UsageSnapshot?
     @Published private(set) var isRefreshing = false
+
+    /// Held for the app's lifetime to opt out of App Nap — otherwise macOS
+    /// throttles this background agent and the poll timer stops firing, leaving
+    /// stale usage on the widget. `…AllowingIdleSystemSleep` still lets the Mac sleep.
+    private var activityToken: NSObjectProtocol?
 
     /// Poll interval in minutes (floor 3 min). Persisted in standard defaults.
     var pollMinutes: Int {
@@ -33,6 +39,14 @@ final class UsageMonitor: ObservableObject {
     }
 
     func start() {
+        activityToken = ProcessInfo.processInfo.beginActivity(
+            options: .userInitiatedAllowingIdleSystemSleep,
+            reason: "Polling Claude usage")
+        // Refresh when the Mac wakes, so data isn't stale after sleep.
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in await self?.refresh() }
+        }
         Task { await refresh() }
         restartTimer()
     }
