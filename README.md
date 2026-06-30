@@ -2,6 +2,8 @@
 
 A native macOS **desktop widget** that shows your [Claude](https://claude.ai) usage as a glowing speedometer gauge — right on your desktop or in Notification Center.
 
+![Claude Usage Gauge — Session, Weekly, and Credits widgets](screenshots/hero.png)
+
 Each widget shows one window of your choice:
 
 | Window | What it shows |
@@ -63,10 +65,6 @@ The usage endpoint rate‑limits requests that don't send a `claude-code/<versio
 ## A note on terms of service
 
 This tool reuses **your own** Claude Code OAuth token to read **your own** usage, read‑only. That is materially lower‑risk than scraping the claude.ai web session, and it is not the inference‑via‑third‑party‑tools behavior Anthropic actively restricts. However, Anthropic's consumer terms intend that token for use with Claude Code and claude.ai, so this is a gray area — use it at your own discretion. If your token expires (e.g. you haven't run Claude Code in a while), the widget shows "Token expired — run Claude Code to refresh"; it never refreshes the token itself.
-
-## Credits
-
-Gauge concept inspired by [Xczer/claude-usage-widget](https://github.com/Xczer/claude-usage-widget) (MIT). This is an independent rewrite using the official OAuth usage endpoint and a custom UI.
 
 ## License
 
