@@ -22,3 +22,6 @@ xcuserdata/
 
 # CocoaPods (not used, but just in case)
 Pods/
+
+# Local project notes — never publish
+CLAUDE.md
