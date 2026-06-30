@@ -12,7 +12,7 @@ Each widget shows one window of your choice:
 | **Weekly (7d)** | Your weekly limit across all models |
 | **Credits ($)** | Pay‑as‑you‑go "extra usage" spend vs. your monthly cap |
 
-Place several — each set to a different window via **Edit Widget**.
+Each is its own widget — place one, or all three, in small / medium / large.
 
 ## How it works
 
@@ -30,7 +30,7 @@ Claude Usage Gauge reads usage from the **same endpoint the Claude Code CLI uses
 ┌──────────────────────────────────────────────────────────┐
 │ WidgetKit extension (sandboxed)                           │
 │  • renders the gauge from the cached usage                │
-│  • per‑instance picker chooses Session / Weekly / Credits │
+│  • three widgets: Session / Weekly / Credits              │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -44,7 +44,9 @@ The host runs as a background menu‑bar agent and feeds the sandboxed widget; t
 
 ## Install
 
-This is built from source — no pre‑built binary is distributed.
+Built from source — no pre‑built binary is distributed. Takes about a minute.
+
+### 1. Build & install
 
 ```sh
 git clone https://github.com/angelo-swe/claude-usage-gauge.git
@@ -52,15 +54,27 @@ cd claude-usage-gauge
 ./deploy.sh
 ```
 
-`deploy.sh` builds the app, installs it to `~/Applications`, registers the widget, and launches the menu‑bar agent. If you have an Apple Development signing identity it's used automatically (so the Keychain grant persists across rebuilds); otherwise it falls back to ad‑hoc signing.
+`deploy.sh` builds the app, installs it to `~/Applications/ClaudeGauge.app`, registers the widgets, and launches the menu‑bar agent. If you have an Apple Development signing identity it's used automatically — so the Keychain grant below persists across rebuilds; otherwise it falls back to ad‑hoc signing (which re‑prompts after each rebuild).
 
-**First launch** shows one macOS Keychain prompt — *"Claude Usage Gauge wants to use … Claude Code‑credentials"* — choose **Always Allow** so the app can read your token.
+### 2. Allow Keychain access
 
-Then add the widget: right‑click the desktop → **Edit Widgets** → search **"Claude Usage Gauge"** → drag out the small size. Right‑click it → **Edit Widget** to pick the window.
+On first launch macOS asks: **"ClaudeGauge wants to use … Claude Code‑credentials."** Click **Always Allow** so the app can read your Claude Code token. A gauge icon appears in your menu bar — click it for status, **Refresh now**, poll interval, and **Launch at Login**.
+
+### 3. Add a widget to your desktop
+
+Right‑click the desktop → **Edit Widgets** → search **"Claude"**. There are three widgets — drag out whichever you want (place all three if you like):
+
+- **Claude — Session (5h)** — your rolling 5‑hour session usage
+- **Claude — Weekly (7d)** — your weekly usage across all models
+- **Claude — Credits ($)** — your pay‑as‑you‑go credit spend
+
+Each comes in **small, medium, and large**. That's it — the gauge updates automatically.
+
+> **Updating later:** re‑run `./deploy.sh` after pulling changes. With ad‑hoc signing you'll re‑approve the Keychain prompt once per rebuild; with an Apple Development identity it stays approved.
 
 ## Updating the User‑Agent
 
-The usage endpoint rate‑limits requests that don't send a `claude-code/<version>` User‑Agent. The version is set in `ClaudeGauge/Services/APIService.swift` (`UsageAPI.userAgent`); bump it if your Claude Code version changes and you start seeing `HTTP 429`.
+The usage endpoint rate‑limits requests that don't send a `claude-code/<version>` User‑Agent. The version is set in `ClaudeGauge/Services/UsageAPI.swift` (`UsageAPI.userAgent`); bump it if your Claude Code version changes and you start seeing `HTTP 429`.
 
 ## A note on terms of service
 
